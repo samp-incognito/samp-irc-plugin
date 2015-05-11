@@ -31,13 +31,13 @@ ifeq ($(config),debug)
   OBJDIR     = obj/linux/Debug
   TARGETDIR  = bin/linux/Debug
   TARGET     = $(TARGETDIR)/irc.so
-  DEFINES   += -DBOOST_CHRONO_HEADER_ONLY
+  DEFINES   += -DBOOST_CHRONO_HEADER_ONLY -DBOOST_SYSTEM_NO_DEPRECATED
   INCLUDES  += -Iinclude
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O0 -Wall
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -rdynamic -shared
-  LIBS      += -lcrypto -lrt -lssl
+  LIBS      += -lrt
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
@@ -53,13 +53,13 @@ ifeq ($(config),release)
   OBJDIR     = obj/linux/Release
   TARGETDIR  = bin/linux/Release
   TARGET     = $(TARGETDIR)/irc.so
-  DEFINES   += -DBOOST_CHRONO_HEADER_ONLY -DNDEBUG
+  DEFINES   += -DBOOST_CHRONO_HEADER_ONLY -DBOOST_SYSTEM_NO_DEPRECATED -DNDEBUG
   INCLUDES  += -Iinclude
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -ffast-math -fmerge-all-constants -fno-strict-aliasing -fvisibility=hidden -fvisibility-inlines-hidden -O3 -Wall
   CXXFLAGS  += $(CFLAGS) 
   LDFLAGS   += -s -shared
-  LIBS      += -lcrypto -lrt -lssl
+  LIBS      += -lrt
   RESFLAGS  += $(DEFINES) $(INCLUDES) 
   LDDEPS    += 
   LINKCMD    = $(CXX) -o $(TARGET) $(OBJECTS) $(LDFLAGS) $(RESOURCES) $(ARCH) $(LIBS)
