@@ -20,6 +20,7 @@
 #include "common.h"
 
 #include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
 #include <map>
@@ -46,6 +47,7 @@ public:
 	bool connected;
 	int botID;
 	int groupID;
+	bool ssl;
 	bool quitting;
 
 	std::string nickname;
@@ -61,6 +63,7 @@ public:
 	UserMap users;
 private:
 	void handleConnect(const boost::system::error_code &error, boost::asio::ip::tcp::resolver::iterator iterator);
+	void handleHandshake(const boost::system::error_code &error);
 	void handleRead(const boost::system::error_code &error, std::size_t transferredBytes);
 	void handleResolve(const boost::system::error_code &error, boost::asio::ip::tcp::resolver::iterator iterator);
 	void handleWrite(const boost::system::error_code &error);
@@ -102,7 +105,9 @@ private:
 	};
 
 	boost::asio::ip::tcp::socket clientSocket;
+	boost::asio::ssl::context context;
 	boost::asio::ip::tcp::resolver resolver;
+	boost::asio::ssl::stream<boost::asio::ip::tcp::socket> secureClientSocket;
 
 	boost::asio::deadline_timer connectTimer;
 	boost::asio::deadline_timer connectTimeoutTimer;

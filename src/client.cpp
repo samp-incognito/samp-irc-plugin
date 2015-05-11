@@ -20,6 +20,7 @@
 #include "main.h"
 
 #include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/format.hpp>
@@ -36,7 +37,9 @@
 
 Client::Client(boost::asio::io_service &io_service) :
 	clientSocket(io_service),
+	context(io_service, boost::asio::ssl::context::sslv23_client),
 	resolver(io_service),
+	secureClientSocket(io_service, context),
 	connectTimer(io_service),
 	connectTimeoutTimer(io_service),
 	receiveTimeoutTimer(io_service),
@@ -64,6 +67,7 @@ Client::Client(boost::asio::io_service &io_service) :
 	connectDelay = 20;
 	connectTimeout = 10;
 	connected = false;
+	context.set_verify_mode(boost::asio::ssl::context::verify_none);
 	currentConnectAttempts = 1;
 	receiveTimeout = std::numeric_limits<int>::max();
 	respawn = true;
@@ -79,13 +83,20 @@ void Client::handleConnect(const boost::system::error_code &error, boost::asio::
 	{
 		connectedAddress = iterator->endpoint().address().to_string();
 		connectedPort = iterator->endpoint().port();
-		if (!serverPassword.empty())
+		if (ssl)
 		{
-			sendAsync(boost::str(boost::format("PASS %1%\r\n") % serverPassword));
+			secureClientSocket.async_handshake(boost::asio::ssl::stream_base::client, boost::bind(&Client::handleHandshake, shared_from_this(), boost::asio::placeholders::error));
 		}
-		sendAsync(boost::str(boost::format("USER %1% 0 * :%2%\r\nNICK %3%\r\n") % username % realname % nickname));
-		startRead();
-		connectTimeoutTimer.cancel();
+		else
+		{
+			if (!serverPassword.empty())
+			{
+				sendAsync(boost::str(boost::format("PASS %1%\r\n") % serverPassword));
+			}
+			sendAsync(boost::str(boost::format("USER %1% 0 * :%2%\r\nNICK %3%\r\n") % username % realname % nickname));
+			startRead();
+			connectTimeoutTimer.cancel();
+		}
 	}
 	else
 	{
@@ -112,6 +123,29 @@ void Client::handleConnect(const boost::system::error_code &error, boost::asio::
 			stopAsync();
 			startConnectTimer(iterator);
 		}
+	}
+}
+
+void Client::handleHandshake(const boost::system::error_code &error)
+{
+	boost::mutex::scoped_lock lock(core->mutex);
+	if (!error)
+	{
+		sendAsync(boost::str(boost::format("USER %1% 0 * :%2%\r\nNICK %3%\r\n") % username % realname % nickname));
+		startRead();
+		connectTimeoutTimer.cancel();
+	}
+	else
+	{
+		Data::Message message;
+		message.array.push_back(Data::OnConnectAttemptFail);
+		message.array.push_back(connectedPort);
+		message.array.push_back(botID);
+		message.buffer.push_back(error.message());
+		message.buffer.push_back(connectedAddress);
+		core->messages.push(message);
+		stopAsync();
+		startAsync();
 	}
 }
 
@@ -232,7 +266,14 @@ void Client::handleConnectTimer(const boost::system::error_code &error, boost::a
 			message.array.push_back(botID);
 			message.buffer.push_back(iterator->endpoint().address().to_string());
 			core->messages.push(message);
-			clientSocket.async_connect(iterator->endpoint(), boost::bind(&Client::handleConnect, shared_from_this(), boost::asio::placeholders::error, iterator));
+			if (ssl)
+			{
+				secureClientSocket.lowest_layer().async_connect(iterator->endpoint(), boost::bind(&Client::handleConnect, shared_from_this(), boost::asio::placeholders::error, iterator));
+			}
+			else
+			{
+				clientSocket.async_connect(iterator->endpoint(), boost::bind(&Client::handleConnect, shared_from_this(), boost::asio::placeholders::error, iterator));
+			}
 			startConnectTimeoutTimer();
 		}
 		else
@@ -285,13 +326,27 @@ void Client::sendAsync(const std::string &buffer)
 	{
 		sentData = buffer;
 		writeInProgress = true;
-		boost::asio::async_write(clientSocket, boost::asio::buffer(sentData, sentData.length()), boost::bind(&Client::handleWrite, shared_from_this(), boost::asio::placeholders::error));
+		if (ssl)
+		{
+			boost::asio::async_write(secureClientSocket, boost::asio::buffer(sentData, sentData.length()), boost::bind(&Client::handleWrite, shared_from_this(), boost::asio::placeholders::error));
+		}
+		else
+		{
+			boost::asio::async_write(clientSocket, boost::asio::buffer(sentData, sentData.length()), boost::bind(&Client::handleWrite, shared_from_this(), boost::asio::placeholders::error));
+		}
 	}
 }
 
 bool Client::socketOpen()
 {
-	return clientSocket.is_open();
+	if (ssl)
+	{
+		return secureClientSocket.lowest_layer().is_open();
+	}
+	else
+	{
+		return clientSocket.is_open();
+	}
 }
 
 void Client::startAsync()
@@ -308,25 +363,45 @@ void Client::stopAsync()
 		boost::system::error_code error;
 		if (connected)
 		{
-			clientSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+			if (ssl)
+			{
+				secureClientSocket.lowest_layer().shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+			}
+			else
+			{
+				clientSocket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, error);
+			}
 			connected = false;
 			pendingChannels.clear();
 			pendingMessages = std::queue<std::string>();
 			users.clear();
 			writeInProgress = false;
 		}
-		clientSocket.close(error);
+		if (ssl)
+		{
+			secureClientSocket.lowest_layer().close(error);
+		}
+		else
+		{
+			clientSocket.close(error);
+		}
 		connectTimer.cancel(error);
 		connectTimeoutTimer.cancel(error);
 		receiveTimeoutTimer.cancel(error);
-		resolveTimer.cancel(error);
 	}
 	core->clients.erase(botID);
 }
 
 void Client::startRead()
 {
-	clientSocket.async_read_some(boost::asio::buffer(receivedData, MAX_BUFFER), boost::bind(&Client::handleRead, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+	if (ssl)
+	{
+		secureClientSocket.async_read_some(boost::asio::buffer(receivedData, MAX_BUFFER), boost::bind(&Client::handleRead, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+	}
+	else
+	{
+		clientSocket.async_read_some(boost::asio::buffer(receivedData, MAX_BUFFER), boost::bind(&Client::handleRead, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+	}
 }
 
 void Client::startConnectTimer(boost::asio::ip::tcp::resolver::iterator iterator)
@@ -339,13 +414,27 @@ void Client::startConnectTimer(boost::asio::ip::tcp::resolver::iterator iterator
 		{
 			logprintf("*** IRC Plugin: Error using supplied local address: %s", error.message().c_str());
 		}
-		clientSocket.open(boost::asio::ip::tcp::v4(), error);
+		if (ssl)
+		{
+			secureClientSocket.lowest_layer().open(boost::asio::ip::tcp::v4(), error);
+		}
+		else
+		{
+			clientSocket.open(boost::asio::ip::tcp::v4(), error);
+		}
 		if (error)
 		{
 			logprintf("*** IRC Plugin: Error opening socket: %s", error.message().c_str());
 		}
 		boost::asio::ip::tcp::endpoint endpoint(address, 0);
-		clientSocket.bind(endpoint, error);
+		if (ssl)
+		{
+			secureClientSocket.lowest_layer().bind(endpoint, error);
+		}
+		else
+		{
+			clientSocket.bind(endpoint, error);
+		}
 		if (error)
 		{
 			logprintf("*** IRC Plugin: Error binding local address to socket: %s", error.message().c_str());
@@ -771,6 +860,7 @@ void Client::parseBuffer(const std::string &buffer)
 				{
 					if (!host.empty() && !parameters.empty() && !user.empty())
 					{
+						boost::algorithm::trim(delimitedParameters);
 						std::size_t result = delimitedParameters.find_first_of(' ');
 						if (result != std::string::npos)
 						{
