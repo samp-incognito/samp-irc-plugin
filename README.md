@@ -3,6 +3,14 @@ SA-MP IRC Plugin
 
 This plugin allows for the creation and management of IRC bots through the SA-MP server. There are many features, including:
 
+- SSL support and local IP address binding
+- Automatic reconnection attempts with configurable options
+- Bot grouping (built-in support for message distribution to prevent
+  accidental flooding)
+- No limit on number of concurrent bot connections (support for
+  multiple servers)
+- Efficient channel command system (slightly modified zcmd by Zeex)
+
 Compilation (Windows)
 ---------------------
 
