@@ -634,7 +634,7 @@ void Client::parseBuffer(const std::string &buffer)
 			{
 				case Nick:
 				{
-					if (!host.empty() && !trailing.empty() && !user.empty())
+					if (!host.empty() && !parameters.empty() && !user.empty())
 					{
 						if (user.compare(nickname) != 0)
 						{
@@ -642,18 +642,18 @@ void Client::parseBuffer(const std::string &buffer)
 							message.array.push_back(Data::OnUserNickChange);
 							message.array.push_back(botID);
 							message.buffer.push_back(host);
-							message.buffer.push_back(trailing);
+							message.buffer.push_back(parameters.back());
 							message.buffer.push_back(user);
 							core->messages.push(message);
 						}
 						else
 						{
-							nickname = trailing;
+							nickname = parameters.back();
 						}
 						UserMap::iterator f = users.find(user);
 						if (f != users.end())
 						{
-							users.insert(std::make_pair(trailing, f->second));
+							users.insert(std::make_pair(parameters.back(), f->second));
 							users.erase(f);
 						}
 					}
