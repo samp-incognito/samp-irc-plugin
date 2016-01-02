@@ -1,6 +1,10 @@
 SA-MP IRC Plugin
 ================
 
+v1.4.7:
+-------
+- Fixed IRC_OnUserNickChange bug
+
 v1.4.6:
 -------
 
