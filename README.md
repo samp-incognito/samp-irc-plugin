@@ -14,14 +14,12 @@ This plugin allows for the creation and management of IRC bots through the SA-MP
 Compilation (Windows)
 ---------------------
 
-Open the solution file (irc.sln) in Microsoft Visual Studio
-2010 or higher. Build the project.
+Open the solution file (irc.sln) in Microsoft Visual Studio 2010 or higher. Build the project.
 
 Compilation (Linux)
 -------------------
 
-Install the GNU Compiler Collection and GNU Make. Type "make"
-in the top directory to compile the source code.
+Install the GNU Compiler Collection and GNU Make. Type "make" in the top directory to compile the source code.
 
 Download
 --------
