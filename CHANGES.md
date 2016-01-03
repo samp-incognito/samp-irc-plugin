@@ -1,32 +1,33 @@
 SA-MP IRC Plugin
 ================
 
-v1.4.7:
--------
+v1.4.7
+------
+
 - Fixed IRC_OnUserNickChange bug
 
-v1.4.6:
--------
+v1.4.6
+------
 
 - Fixed IRC_Quit bug (thanks Renegade334)
 - Added E_IRC_RESPAWN option to IRC_SetIntData to set whether bots
   automatically reconnect upon disconnection (thanks Renegade334)
 
-v1.4.5:
--------
+v1.4.5
+------
 
 - Added server password parameter to IRC_Connect
 
-v1.4.4:
--------
+v1.4.4
+------
 
 - Made plugin attempt to resolve addresses again (with maximum number
   of attempts set to 5 by default) if resolving ever fails
 - Disabled receive timeout by default
 - Added IRC_OnReceiveNumeric
 
-v1.4.3:
--------
+v1.4.3
+------
 
 - Fixed a bug that could possibly occur if the server never closes
   the connection upon using IRC_Quit
@@ -36,21 +37,21 @@ v1.4.3:
 - Updated libraries, optimized some code, and fixed a few small bugs
 - Added IRC_OnInvitedToChannel
 
-v1.4.2:
--------
+v1.4.2
+------
 
 - Fixed crash that sometimes occurred when the IRC server closed the
   socket
 - Fixed bug with IRC_GetUserChannelMode that caused it not to return
   "-" when the user had no mode
 
-v1.4.1:
--------
+v1.4.1
+------
 
 - Added CTCP natives and callbacks
 
-v1.4:
------
+v1.4
+----
 
 - Rewrote networking code to support asynchronous I/O
 - Added functionality for trying each IP address linked to an IRC
@@ -64,18 +65,18 @@ v1.4:
 - Update: Fixed bug with maintaining user lists on multiple channels
 - Update: Fixed bug with parsing user lists on non-public channels
 
-v1.3.6:
--------
+v1.3.6
+------
 
 - Resolved some deadlocking issues
 
-v1.3.5:
--------
+v1.3.5
+------
 
 - Fixed internal user list storage bug and possible crash
 
-v1.3.4:
--------
+v1.3.4
+------
 
 - Made the plugin strip the '%' character from all messages sent by
   the IRC server
@@ -83,37 +84,37 @@ v1.3.4:
 - Fixed bug in channel command system
 - Improved quite a bit of code
 
-v1.3.3:
--------
+v1.3.3
+------
 
 - Fixed IRC_OnReceiveRaw crash
 
-v1.3.2:
--------
+v1.3.2
+------
 
 - Added SSL support
 - Added ability to bind local IP addresses
 
-v1.3.1:
--------
+v1.3.1
+------
 
 - Made some optimizations to the connection and message parsing code
 
-v1.3:
------
+v1.3
+----
 
 - Fixed bot and group ID assignment bug
 - Improved channel command system
 
-v1.2:
------
+v1.2
+----
 
 - Added IRC_IsUserOnChannel native
 - Added IRC_GetChannelUserList native
 - Renamed IRC_SetChannelMode to IRC_SetMode
 
-v1.1:
------
+v1.1
+----
 
 - Fixed bug that crashed the server when internal callback queue
   began to be filled
@@ -124,7 +125,7 @@ v1.1:
 - Added extra argument to IRC_JoinChannel that lets bots specify a
   channel key
 
-v1.0:
------
+v1.0
+----
 
 - Initial release
