@@ -36,9 +36,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="lib\boost\system\src\local_free_on_destruction.hpp">
-      <Filter>lib\boost\system\src</Filter>
-    </ClInclude>
     <ClInclude Include="lib\sdk\src\plugin.h">
       <Filter>lib\sdk\src</Filter>
     </ClInclude>
