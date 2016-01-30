@@ -9,7 +9,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 		BLOCK "04090025"
 		{
 			VALUE "FileDescription", "SA-MP IRC Plugin"
-			VALUE "LegalCopyright", "Copyright © 2014 Incognito"
+			VALUE "LegalCopyright", "Copyright © 2016 Incognito"
 			VALUE "OriginalFilename", "irc.dll"
 			VALUE "ProductName", "SA-MP IRC Plugin"
 			VALUE "ProductVersion", "v1.4.7"
