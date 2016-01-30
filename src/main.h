@@ -17,7 +17,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#define PLUGIN_VERSION "1.4.6"
+#define PLUGIN_VERSION "1.4.8"
 
 #include <sdk/plugin.h>
 

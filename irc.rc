@@ -2,7 +2,7 @@
 
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 1 VERSIONINFO
-	FILEVERSION 1,4,7,0
+	FILEVERSION 1,4,8,0
 {
 	BLOCK "StringFileInfo"
 	{
@@ -12,7 +12,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 			VALUE "LegalCopyright", "Copyright © 2016 Incognito"
 			VALUE "OriginalFilename", "irc.dll"
 			VALUE "ProductName", "SA-MP IRC Plugin"
-			VALUE "ProductVersion", "v1.4.7"
+			VALUE "ProductVersion", "v1.4.8"
 		}
 	}
 	BLOCK "VarFileInfo"
