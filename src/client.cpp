@@ -131,6 +131,10 @@ void Client::handleHandshake(const boost::system::error_code &error)
 	boost::mutex::scoped_lock lock(core->mutex);
 	if (!error)
 	{
+		if (!serverPassword.empty())
+		{
+			sendAsync(boost::str(boost::format("PASS %1%\r\n") % serverPassword));
+		}
 		sendAsync(boost::str(boost::format("USER %1% 0 * :%2%\r\nNICK %3%\r\n") % username % realname % nickname));
 		startRead();
 		connectTimeoutTimer.cancel();
