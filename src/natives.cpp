@@ -60,6 +60,11 @@ cell AMX_NATIVE_CALL Natives::IRC_Connect(AMX *amx, cell *params)
 		return 0;
 	}
 	bool ssl = static_cast<int>(params[6]) != 0;
+	if (ssl)
+	{
+		logprintf("*** IRC_Connect: SSL disabled");
+		return 0;
+	}
 	char *localAddress = NULL;
 	amx_StrParam(amx, params[7], localAddress);
 	int botID = 1;
@@ -82,7 +87,6 @@ cell AMX_NATIVE_CALL Natives::IRC_Connect(AMX *amx, cell *params)
 	client->remoteAddress = remoteAddress;
 	client->remotePort = remotePort;
 	client->serverPassword = (serverPassword ? serverPassword : "");
-	client->ssl = ssl;
 	client->username = username;
 	client->startAsync();
 	return static_cast<cell>(botID);
