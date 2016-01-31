@@ -1,6 +1,11 @@
 SA-MP IRC Plugin
 ================
 
+v1.4.8
+------
+
+- Fixed server password SSL connection bug
+
 v1.4.7
 ------
 
