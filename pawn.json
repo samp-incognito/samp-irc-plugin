@@ -1,0 +1,23 @@
+{
+    "user": "samp-incognito",
+    "repo": "samp-irc-plugin",
+    "resources": [
+        {
+            "name": "^samp-irc-plugin-(.*).zip$",
+            "platform": "windows",
+            "archive": true,
+            "includes": ["pawno/include"],
+            "plugins": ["plugins/irc.dll"]
+        },
+        {
+            "name": "^samp-irc-plugin-(.*).zip$",
+            "platform": "linux",
+            "archive": true,
+            "includes": ["pawno/include"],
+            "plugins": ["plugins/irc.so"]
+        }
+    ],
+    "runtime": {
+        "plugins": ["samp-incognito/samp-irc-plugin"]
+    }
+}
