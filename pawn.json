@@ -6,14 +6,12 @@
             "name": "^samp-irc-plugin-(.*).zip$",
             "platform": "windows",
             "archive": true,
-            "includes": ["pawno/include"],
             "plugins": ["plugins/irc.dll"]
         },
         {
             "name": "^samp-irc-plugin-(.*).zip$",
             "platform": "linux",
             "archive": true,
-            "includes": ["pawno/include"],
             "plugins": ["plugins/irc.so"]
         }
     ],
