@@ -16,7 +16,7 @@
 
 #include <a_samp>
 
-// Enumerator
+// Enum
 
 enum
 {
@@ -78,7 +78,7 @@ forward IRC_OnUserReplyCTCP(botid, const user[], const host[], const message[]);
 forward IRC_OnReceiveNumeric(botid, numeric, const message[]);
 forward IRC_OnReceiveRaw(botid, const message[]);
 
-// Stock Functions
+// Helper Functions
 
 stock IRC_IsVoice(botid, const channel[], const user[])
 {

@@ -5,6 +5,8 @@ v1.4.8
 ------
 
 - Fixed server password SSL connection bug
+- Update: Fixed const correctness issues in include file (thanks
+  spacemud)
 
 v1.4.7
 ------
